@@ -229,3 +229,25 @@ html {
   font-style: normal;
   font-weight: 200;
 }
+
+#lastfm #info {
+    line-height: 40px;
+}
+
+@media (max-width: 1080px) {
+  #lastfm #cover {
+    width: 22vw;
+  }
+}
+
+@media (max-width: 720px) {
+  #lastfm #cover {
+    width: 29vw;
+  }
+}
+
+@media (max-width: 480px) {
+  #lastfm #cover {
+    width: 36vw;
+  }
+}
