@@ -141,6 +141,11 @@ html {
   top: -35px;
 }
 
+.time .ampm {
+  font-size: 25px;
+  color: #666;
+}
+
 .forecast-table {
   float: right;
   text-align: right;
@@ -230,8 +235,90 @@ html {
   font-weight: 200;
 }
 
+#fitbit {
+    padding-left: 40px;
+    line-height: 50px;
+}
+
+.battery .battery-level.high {
+    background-color: #66CD00;
+}
+.battery .battery-level.medium {
+    background-color: #FCD116;
+}
+.battery .battery-level.low {
+    background-color: #FF3333;
+}
+
+path {
+    stroke: lightgrey;
+    stroke-width: 1;
+    fill: none;
+}
+
+.axis {
+    shape-rendering: crispEdges;
+    fill: none;
+}
+.x.axis path {
+    display: none;
+    fill: none;
+}
+.y.axis line, .y.axis path {
+    stroke: #000;
+    fill: none;
+}
+
+#lastfm {
+    padding-right: 40px;
+}
+
 #lastfm #info {
     line-height: 40px;
+    text-align: right;
+}
+
+#bgimg{
+   width:100%;
+   background-image:url(https://41.media.tumblr.com/a8737c93b6605ece4290c0896acafaae/tumblr_ng36upYjYI1u55wl2o1_500.jpg);/*your background image*/  
+   background-repeat:no-repeat;/*we want to have one single image not a repeated one*/
+   position:absolute; width:100%; height:100%;
+   background-size:cover;/*this sets the image to fullscreen covering the whole screen*/
+   opacity: 0.3;
+}
+
+video#bgvid { 
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    opacity: 0.4;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    background: url(http://images.apple.com/home/images/og.jpg) no-repeat;
+    background-size: cover;
+}
+
+video#bgvid {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    opacity: 0.4;
+    -ms-transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
+    background: url(http://images.apple.com/home/images/og.jpg) no-repeat;
+    background-size: cover;
 }
 
 @media (max-width: 1080px) {

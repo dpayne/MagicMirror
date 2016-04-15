@@ -1,0 +1,8 @@
+{
+    "name": "MagicMirror",
+    "description": "MagicMirror",
+    "require": {
+        "php": ">=5.4.0",
+        "league/oauth2-client": "~1.2"
+    }
+}

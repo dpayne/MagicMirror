@@ -1,8 +1,19 @@
 var config = {
     lang: 'en',
+    background: {
+        interval: 300000,
+        backgroundFeed: 'http://aerialwallpapers.tumblr.com/rss',
+        useGoogleFeeds: false,
+        numberOfEntries: 10,
+    },
+    fitbit: {
+        deviceId: 45130172,
+        interval: 300000,
+        fadeInterval: 4000,
+    },
     lastfm: {
-        apiKey: 'YOUR_LASTFM_API_KEY',
-        user: 'YOUR_LASTFM_USER',
+        apiKey: 'YOUR_LAST_FM_API_KEY',
+        user: 'YOUR_LAST_FM_USERNAME',
         interval: 3000,
         fadeInterval: 4000,
     },
@@ -12,7 +23,7 @@ var config = {
         digitFade: false,
     },
     weather: {
-        interval: 10000,
+        interval: 60000,
         //change weather params here:
         //units: metric or imperial
         params: {
@@ -20,7 +31,7 @@ var config = {
             units: 'imperial',
             // if you want a different lang for the weather that what is set above, change it here
             lang: 'en',
-            APPID: 'YOUR_FREE_OPENWEATHER_API_KEY'
+            APPID: 'YOUR_WEATHER_API_KEY'
         }
     },
     compliments: {
@@ -32,7 +43,7 @@ var config = {
             'How was your sleep?'
         ],
         afternoon: [
-            'Hello, beauty!',
+            'Hello, world!',
             'You look sexy!',
             'Looking good today!'
         ],
@@ -49,11 +60,11 @@ var config = {
         urls: [
 		{
 			symbol: 'calendar-plus-o',
-			url: 'https://p01-calendarws.icloud.com/ca/subscribe/1/n6x7Farxpt7m9S8bHg1TGArSj7J6kanm_2KEoJPL5YIAk3y70FpRo4GyWwO-6QfHSY5mXtHcRGVxYZUf7U3HPDOTG5x0qYnno1Zr_VuKH2M'
+			url: 'https://calendar.google.com/calendar/ical/YOUR_GOOGLE_CALENDAR_ACCOUNT%40gmail.com/private-PRIVATE_CALENDAR/basic.ics'
 		},
 		{
 			symbol: 'calendar-o',
-			url: 'https://www.google.com/calendar/ical/akvbisn5iha43idv0ktdalnor4%40group.calendar.google.com/public/basic.ics',
+			url: 'https://calendar.google.com/calendar/ical/en.usa%23holiday%40group.v.calendar.google.com/public/basic.ics',
 		},
 		]
     },

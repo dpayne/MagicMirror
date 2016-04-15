@@ -20,7 +20,7 @@ time.updateTime = function () {
 	$('.fade').removeClass('fade')
 	var html = ''
 	if (this.displaySeconds) {
-		html = _now.format(this._timeFormat+':mm').replace(/./g, '<span class="digit">$&</span>') + 
+		html = _now.format(this._timeFormat).replace(/./g, '<span class="digit">$&</span>') + 
 			'<span class="sec">' + _now.format('ss').replace(/./g, '<span class="digit">$&</span>') + '</span>';
 		if (typeof this.intervalId == 'undefined') {
 			this.intervalId = setInterval(function () {
@@ -28,7 +28,7 @@ time.updateTime = function () {
 			}.bind(this), this.updateInterval);
 		}
 	} else {
-		html = _now.format(this._timeFormat+':mm').replace(/./g, '<span class="digit">$&</span>');
+		html = _now.format(this._timeFormat).replace(/./g, '<span class="digit">$&</span>');
 		if (this.intervalId) {
 			clearInterval(this.intervalId);
 			this.intervalId = undefined;
@@ -71,9 +71,9 @@ time.updateTime = function () {
 		}
 	} else {
 		if (this.displaySeconds) {
-			$(this.timeLocation).html(_now.format(this._timeFormat+':mm[<span class="sec">]ss[</span>]'));
+			$(this.timeLocation).html(_now.format(this._timeFormat + '[<span class="sec">]ss[</span>]'));
 		} else {
-			$(this.timeLocation).html(_now.format(this._timeFormat+':mm'));
+			$(this.timeLocation).html(_now.format(this._timeFormat));
 		}
 	}
 }
@@ -81,9 +81,9 @@ time.updateTime = function () {
 time.init = function () {
 
 	if (parseInt(time.timeFormat) === 12) {
-		time._timeFormat = 'hh'
+		time._timeFormat = 'hh:mm'
 	} else {
-		time._timeFormat = 'HH';
+		time._timeFormat = 'HH:mm';
 	}
 	this.updateTime();
 

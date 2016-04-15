@@ -15,14 +15,11 @@ var lastfm = {
 };
 
 lastfm.updateCover = function (cover) {
-  if (lastfm.coverPrevious != cover) {
+  if (cover && lastfm.coverPrevious != cover) {
     lastfm.coverPrevious = cover;
 
     if (cover) {
       $('#lastfm #cover').attr('src', cover);
-      $('#lastfm #cover').show();
-    } else {
-      $('#lastfm #cover').hide();
     }
   }
 }
@@ -34,14 +31,13 @@ lastfm.updateLastfmMetadata = function (cover, title, artist, link) {
       lastfm.coverRefresh = false;
       lastfm.cover.src = cover;
       lastfm.updateCover(cover);
-    }
-  } else {
-    delete lastfm.cover.src;
-    lastfm.updateCover();
-  }
 
-  $('#lastfm #title').text(title || '');
-  $('#lastfm #artist').text(artist || '');
+      var width = $(document).width();
+
+      $('#lastfm #title').width(width/3).text(title || '');
+      $('#lastfm #artist').width(width/3).text(artist || '');
+    }
+  }
 }
 
 lastfm.updateLastfm = function (url) {
@@ -54,8 +50,17 @@ lastfm.updateLastfm = function (url) {
 
         playing = track['@attr'] && track['@attr'].nowplaying;
         if (playing) {
-          musicPlaying = true;
+          var cover = track.image[track.image.length - 1]['#text'];
+          var title = track.name;
+          var artist = track.artist['#text'];
+          var link = track.url;
 
+          lastfm.updateLastfmMetadata(cover, title, artist, link);
+        }
+        // if no current song playing fallback to last played
+        else
+        {
+            //TODO: fallback to mpc/mpd or some other service like libre.fm
           var cover = track.image[track.image.length - 1]['#text'];
           var title = track.name;
           var artist = track.artist['#text'];
@@ -64,11 +69,6 @@ lastfm.updateLastfm = function (url) {
           lastfm.updateLastfmMetadata(cover, title, artist, link);
         }
       }
-    }
-
-    if (!playing) {
-      musicPlaying = false;
-      lastfm.updateLastfmMetadata();
     }
   });
 }

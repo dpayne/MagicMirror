@@ -33,6 +33,7 @@ var weather = {
 	fadeInterval: config.weather.fadeInterval || 1000,
 	intervalId: null,
 	orientation: config.weather.orientation || 'vertical',
+    updateCurrentWeatherApiTtl: 15 * 60, // 15 mins
 }
 
 /**
@@ -62,49 +63,116 @@ weather.ms2Beaufort = function(ms) {
 	return 12;
 }
 
+weather.updateCurrentWeatherCallback = function (data) {
+    var _temperature = this.roundValue(data.main.temp),
+        _temperatureMin = this.roundValue(data.main.temp_min),
+        _temperatureMax = this.roundValue(data.main.temp_max),
+        _wind = this.roundValue(data.wind.speed),
+        _iconClass = this.iconTable[data.weather[0].icon];
+
+    var _icon = '<span class="icon ' + _iconClass + ' dimmed wi"></span>';
+
+    var _newTempHtml = _icon + '' + _temperature + '&deg;';
+
+    $(this.temperatureLocation).updateWithText(_newTempHtml, this.fadeInterval);
+
+    var _now = moment().format(weather._timeFormat),
+        _sunrise = moment(data.sys.sunrise*1000).format(weather._timeFormat),
+        _sunset = moment(data.sys.sunset*1000).format(weather._timeFormat);
+
+    var _newWindHtml = '<span class="wind"><span class="wi wi-strong-wind xdimmed"></span> ' + this.ms2Beaufort(_wind) + '</span>',
+        _newSunHtml = '<span class="sun"><span class="wi wi-sunrise xdimmed"></span> ' + _sunrise + '</span>';
+
+    if (_sunrise < _now && _sunset > _now) {
+        _newSunHtml = '<span class="sun"><span class="wi wi-sunset xdimmed"></span> ' + _sunset + '</span>';
+    }
+
+    $(this.windSunLocation).updateWithText(_newWindHtml + ' ' + _newSunHtml,this.fadeInterval);
+}
+
 /**
  * Retrieves the current temperature and weather patter from the OpenWeatherMap API
  */
 weather.updateCurrentWeather = function () {
+    var cacheKey = "updateCurrentWeatherApi";
+    var cacheKeyTimestamp = "updateCurrentWeatherApiTimestamp";
 
-	$.ajax({
-		type: 'GET',
-		url: weather.apiBase + '/' + weather.apiVersion + '/' + weather.weatherEndpoint,
-		dataType: 'json',
-		data: weather.params,
-		success: function (data) {
+    var cacheTimestamp = localStorage.getItem(cacheKeyTimestamp);
+    var cacheData = localStorage.getItem(cacheKey);
 
-			var _temperature = this.roundValue(data.main.temp),
-				_temperatureMin = this.roundValue(data.main.temp_min),
-				_temperatureMax = this.roundValue(data.main.temp_max),
-				_wind = this.roundValue(data.wind.speed),
-				_iconClass = this.iconTable[data.weather[0].icon];
 
-			var _icon = '<span class="icon ' + _iconClass + ' dimmed wi"></span>';
+    if (((Date.now()/1000) - weather.updateCurrentWeatherApiTtl) <= cacheTimestamp && cacheData !== null)
+    {
+        weatherData = jQuery.parseJSON(cacheData);
+        weather.updateCurrentWeatherCallback(weatherData);
+    }
+    else
+    {
+        $.ajax({
+            type: 'GET',
+            url: weather.apiBase + '/' + weather.apiVersion + '/' + weather.weatherEndpoint,
+            dataType: 'json',
+            data: weather.params,
+            success: function (data) {
 
-			var _newTempHtml = _icon + '' + _temperature + '&deg;';
+                localStorage.setItem(cacheKeyTimestamp, (Date.now()/1000));
+                localStorage.setItem(cacheKey, JSON.stringify(data));
 
-			$(this.temperatureLocation).updateWithText(_newTempHtml, this.fadeInterval);
+                weather.updateCurrentWeatherCallback(data);
+            }.bind(this),
+            error: function () {
 
-			var _now = moment().format('HH:mm'),
-				_sunrise = moment(data.sys.sunrise*1000).format('HH:mm'),
-				_sunset = moment(data.sys.sunset*1000).format('HH:mm');
+            }
+        });
+    }
+}
 
-			var _newWindHtml = '<span class="wind"><span class="wi wi-strong-wind xdimmed"></span> ' + this.ms2Beaufort(_wind) + '</span>',
-				_newSunHtml = '<span class="sun"><span class="wi wi-sunrise xdimmed"></span> ' + _sunrise + '</span>';
+weather.updateWeatherForecastCallback = function (data) {
+    var _opacity = 1,
+        _forecastHtml = '<tr>',
+        _forecastHtml2 = '<tr>',
+        _forecastHtml3 = '<tr>',
+        _forecastHtml4 = '<tr>';
 
-			if (_sunrise < _now && _sunset > _now) {
-				_newSunHtml = '<span class="sun"><span class="wi wi-sunset xdimmed"></span> ' + _sunset + '</span>';
-			}
+    _forecastHtml = '<table class="forecast-table"><tr>';
 
-			$(this.windSunLocation).updateWithText(_newWindHtml + ' ' + _newSunHtml,this.fadeInterval);
+    for (var i = 0, count = data.list.length; i < count; i++) {
 
-		}.bind(this),
-		error: function () {
+        var _forecast = data.list[i];
 
-		}
-	});
+        //don't show yesterday's forecast; each date, .dt is 12p local;
+        var _12hours = 60 * 60 * 12 * 1000;
+        if (_forecast.dt < Math.floor((Date.now() - _12hours) / 1000)) continue;
 
+        if (this.orientation == 'vertical') {
+            _forecastHtml2 = '';
+            _forecastHtml3 = '';
+            _forecastHtml4 = '';
+        }
+
+        _forecastHtml += '<td style="opacity:' + _opacity + '" class="day">' + moment(_forecast.dt, 'X').format('ddd') + '</td>';
+        _forecastHtml2 += '<td style="opacity:' + _opacity + '" class="icon-small ' + this.iconTable[_forecast.weather[0].icon] + '"></td>';
+        _forecastHtml3 += '<td style="opacity:' + _opacity + '" class="temp-max">' + this.roundValue(_forecast.temp.max) + '</td>';
+        _forecastHtml4 += '<td style="opacity:' + _opacity + '" class="temp-min">' + this.roundValue(_forecast.temp.min) + '</td>';
+
+        _opacity -= 0.155;
+
+        if (this.orientation == 'vertical') {
+            _forecastHtml += _forecastHtml2 + _forecastHtml3 + _forecastHtml4 + '</tr>';
+        }
+    }
+    _forecastHtml  += '</tr>',
+    _forecastHtml2 += '</tr>',
+    _forecastHtml3 += '</tr>',
+    _forecastHtml4 += '</tr>';
+
+    if (this.orientation == 'vertical') {
+        _forecastHtml += '</table>';
+    } else {
+        _forecastHtml += _forecastHtml2 + _forecastHtml3 + _forecastHtml4 +'</table>';
+    }
+
+    $(this.forecastLocation).updateWithText(_forecastHtml, this.fadeInterval);
 }
 
 /**
@@ -112,64 +180,34 @@ weather.updateCurrentWeather = function () {
  */
 weather.updateWeatherForecast = function () {
 
-	$.ajax({
-		type: 'GET',
-		url: weather.apiBase + '/' + weather.apiVersion + '/' + weather.forecastEndpoint,
-		data: weather.params,
-		success: function (data) {
+    var cacheKey = "updateWeatherForecastApi";
+    var cacheKeyTimestamp = "updateWeatherForecastApiTimestamp";
 
-			var _opacity = 1,
-				_forecastHtml = '<tr>',
-				_forecastHtml2 = '<tr>',
-				_forecastHtml3 = '<tr>',
-				_forecastHtml4 = '<tr>';
+    var cacheTimestamp = localStorage.getItem(cacheKeyTimestamp);
+    var cacheData = localStorage.getItem(cacheKey);
 
-			_forecastHtml = '<table class="forecast-table"><tr>';
+    if (((Date.now()/1000) - weather.updateCurrentWeatherApiTtl) <= cacheTimestamp && cacheData !== null)
+    {
+        weatherData = jQuery.parseJSON(cacheData);
+        weather.updateWeatherForecastCallback(weatherData);
+    }
+    else
+    {
+        $.ajax({
+            type: 'GET',
+            url: weather.apiBase + '/' + weather.apiVersion + '/' + weather.forecastEndpoint,
+            data: weather.params,
+            success: function (data) {
+                localStorage.setItem(cacheKeyTimestamp, (Date.now()/1000));
+                localStorage.setItem(cacheKey, JSON.stringify(data));
 
-			for (var i = 0, count = data.list.length; i < count; i++) {
+                weather.updateWeatherForecastCallback(data);
+            }.bind(this),
+            error: function () {
 
-				var _forecast = data.list[i];
-
-				//don't show yesterday's forecast; each date, .dt is 12p local;
-				var _12hours = 60 * 60 * 12 * 1000;
-				if (_forecast.dt < Math.floor((Date.now() - _12hours) / 1000)) continue;
-
-				if (this.orientation == 'vertical') {
-					_forecastHtml2 = '';
-					_forecastHtml3 = '';
-					_forecastHtml4 = '';
-				}
-
-				_forecastHtml += '<td style="opacity:' + _opacity + '" class="day">' + moment(_forecast.dt, 'X').format('ddd') + '</td>';
-				_forecastHtml2 += '<td style="opacity:' + _opacity + '" class="icon-small ' + this.iconTable[_forecast.weather[0].icon] + '"></td>';
-				_forecastHtml3 += '<td style="opacity:' + _opacity + '" class="temp-max">' + this.roundValue(_forecast.temp.max) + '</td>';
-				_forecastHtml4 += '<td style="opacity:' + _opacity + '" class="temp-min">' + this.roundValue(_forecast.temp.min) + '</td>';
-
-				_opacity -= 0.155;
-
-				if (this.orientation == 'vertical') {
-					_forecastHtml += _forecastHtml2 + _forecastHtml3 + _forecastHtml4 + '</tr>';
-				}
-			}
-			_forecastHtml  += '</tr>',
-			_forecastHtml2 += '</tr>',
-			_forecastHtml3 += '</tr>',
-			_forecastHtml4 += '</tr>';
-			
-			if (this.orientation == 'vertical') {
-				_forecastHtml += '</table>';
-			} else {
-				_forecastHtml += _forecastHtml2 + _forecastHtml3 + _forecastHtml4 +'</table>';
-			}
-
-			$(this.forecastLocation).updateWithText(_forecastHtml, this.fadeInterval);
-
-		}.bind(this),
-		error: function () {
-
-		}
-	});
-
+            }
+        });
+    }
 }
 
 weather.init = function () {
@@ -180,6 +218,12 @@ weather.init = function () {
 
 	if (this.params.cnt === undefined) {
 		this.params.cnt = 6;
+	}
+
+	if (parseInt(time.timeFormat) === 12) {
+		weather._timeFormat = 'hh:mm a'
+	} else {
+		weather._timeFormat = 'HH:mm';
 	}
 
 	this.intervalId = setInterval(function () {
