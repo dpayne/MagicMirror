@@ -11,9 +11,9 @@ This fork expands on the original by adding last.fm now playing widget, a rotati
 
 ##Examples
 
-![landscape](http://i.imgur.com/xumAL3p.png "Landscape")
+![landscape](http://i.imgur.com/gZ6s4vm.png "Landscape")
 
-![display](http://i.imgur.com/fO0gygD.jpg "Vertical display")
+![display](http://i.imgur.com/5e5We9O.jpg "Vertical display")
 
 
 ##Configuration
