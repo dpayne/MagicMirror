@@ -3,9 +3,17 @@ MagicMirror
 
 ##Introduction
 
-The super magic interface of my personal Magic Mirror. More information about this project can be found on my [blog](http://michaelteeuw.nl/tagged/magicmirror).
+This is my own fork for the magicmirror codebase. More information on the original can be found here [blog](http://michaelteeuw.nl/tagged/magicmirror)
 
-Runs as a php script on a web server with basically no external dependencies. *Can use socket.io for XBEE integration, but isn't required for basic functionality*.
+It runs as a php script we a few dependency found in the `composer.json` as well as a very simple mysql instance. THe mysql instance is required for fitbit charts.
+
+This fork expands on the original by adding last.fm now playing widget, a rotating background, and fitbit stats including a heart rate graph.
+
+##Examples
+
+![landscape](http://i.imgur.com/xumAL3p.png "Landscape")
+
+![display](http://i.imgur.com/fO0gygD.jpg "Vertical display")
 
 
 ##Configuration
